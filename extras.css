@@ -1,0 +1,186 @@
+/* ══════════════════════════════════════════════════════════════
+   extras — a sky that travels from morning to night, a garden
+   that stays with us, butterflies, petals, parallax, and a
+   heart constellation for the finale.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─────────── time-of-day sky (cross-fading layers) ─────────── */
+.sky-layer{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
+  transition:opacity 1.8s ease}
+body.tod-morning .sky-layer.morning,
+body.tod-noon    .sky-layer.noon,
+body.tod-golden  .sky-layer.golden,
+body.tod-dusk    .sky-layer.dusk,
+body.tod-night   .sky-layer.night{opacity:1}
+
+.sky-layer.morning{background:
+  radial-gradient(1200px 700px at 15% -10%, #fff 0%, transparent 60%),
+  radial-gradient(900px 600px at 100% 0%, #ffe3f1 0%, transparent 55%),
+  linear-gradient(170deg,#fff5fa,#ffc9e3)}
+.sky-layer.noon{background:
+  radial-gradient(1000px 600px at 50% -12%, #ffffff 0%, transparent 62%),
+  radial-gradient(800px 700px at 88% 8%, #cdeaff 0%, transparent 60%),
+  linear-gradient(175deg,#f3fbff,#ffd9ec 70%,#ffc2e0)}
+.sky-layer.golden{background:
+  radial-gradient(900px 620px at 76% 12%, #ffe9a8 0%, transparent 58%),
+  radial-gradient(1100px 700px at 20% 0%, #ffd0b0 0%, transparent 62%),
+  linear-gradient(175deg,#ffe6c9,#ffb4cf 62%,#ff9ec5)}
+.sky-layer.dusk{background:
+  radial-gradient(900px 640px at 84% 26%, #ffb07c 0%, transparent 52%),
+  radial-gradient(1200px 800px at 30% 0%, #a56bb0 0%, transparent 66%),
+  linear-gradient(180deg,#6a4a8f,#c86fa0 58%,#ffb3c9)}
+.sky-layer.night{background:
+  radial-gradient(700px 500px at 22% 14%, rgba(214,198,255,.5) 0%, transparent 60%),
+  radial-gradient(1000px 700px at 70% 100%, #4b2a63 0%, transparent 62%),
+  linear-gradient(180deg,#160f2e,#2c1a4a 46%,#5b2f5c)}
+
+/* text needs to survive the dark half of the journey.
+   NOTE: do this per-element, never by re-defining --plum globally —
+   --plum is also every border and the music button's own text colour,
+   so swapping it wholesale makes those disappear. */
+body.tod-dusk .section-title,  body.tod-night .section-title,
+body.tod-dusk .section-sub,    body.tod-night .section-sub,
+body.tod-dusk .yay-sub,        body.tod-night .yay-sub,
+body.tod-dusk .hint,           body.tod-night .hint,
+body.tod-dusk .footer,         body.tod-night .footer,
+body.tod-dusk #scene-places .tiny-note, body.tod-night #scene-places .tiny-note,
+body.tod-dusk #scene-scratch .tiny-note, body.tod-night #scene-scratch .tiny-note{
+  color:#fff4fa;text-shadow:0 2px 12px rgba(22,10,36,.7)}
+
+body.tod-dusk .chapter-head span,body.tod-night .chapter-head span{color:#ffd6ea}
+body.tod-dusk .chapter-head i,  body.tod-night .chapter-head i{border-top-color:rgba(255,214,234,.45)}
+body.tod-night .hills,body.tod-dusk .hills{opacity:.26}
+body.tod-night .cloud,body.tod-dusk .cloud{opacity:.16}
+body.tod-night .pip,body.tod-dusk .pip{background:#2b1a3d}
+body.tod-night .pip.on,body.tod-dusk .pip.on{background:var(--pink-400)}
+
+/* ─────────── sun / moon, arcing across the sky ─────────── */
+.orb{position:fixed;z-index:0;pointer-events:none;width:74px;height:74px;
+  left:12%;top:22%;opacity:0;
+  transition:left 1.8s ease, top 1.8s ease, opacity 1.4s ease}
+.orb.sun{background:
+    radial-gradient(circle at 38% 34%, #fff8d8 0 22%, #ffe071 34%, #ffc84a 70%, #ffb02e 100%);
+  border-radius:50%;
+  box-shadow:0 0 0 10px rgba(255,224,113,.22), 0 0 0 22px rgba(255,224,113,.1)}
+.orb.moon{background:
+    radial-gradient(circle at 34% 30%, #fffdf6 0 26%, #f3e6ff 44%, #ddc9f2 100%);
+  border-radius:50%;
+  box-shadow:0 0 0 10px rgba(238,224,255,.14), 0 0 0 24px rgba(238,224,255,.07)}
+.orb.moon::after{content:"";position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 74% 30%, rgba(0,0,0,.001) 0 30%, transparent 31%),
+    radial-gradient(circle at 30% 62%, rgba(196,170,224,.55) 0 12%, transparent 13%),
+    radial-gradient(circle at 62% 66%, rgba(196,170,224,.45) 0 8%, transparent 9%),
+    radial-gradient(circle at 56% 34%, rgba(196,170,224,.4) 0 7%, transparent 8%)}
+
+body.tod-morning .orb.sun{opacity:1;left:10%;top:24%}
+body.tod-noon    .orb.sun{opacity:1;left:46%;top:9%}
+body.tod-golden  .orb.sun{opacity:1;left:74%;top:22%}
+body.tod-dusk    .orb.sun{opacity:.55;left:88%;top:52%}
+body.tod-night   .orb.moon{opacity:1;left:18%;top:13%}
+
+/* ─────────── stars, only after dark ─────────── */
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
+  transition:opacity 2s ease}
+body.tod-dusk .stars{opacity:.5}
+body.tod-night .stars{opacity:1}
+.star{position:absolute;width:3px;height:3px;background:#fff;border-radius:1px;
+  animation:twinkle var(--tw,3s) steps(2,end) var(--td,0s) infinite alternate}
+.star.big{width:4px;height:4px;box-shadow:0 0 6px 1px rgba(255,255,255,.7)}
+@keyframes twinkle{from{opacity:.25}to{opacity:1}}
+
+/* ─────────── the garden that stays with us ─────────── */
+.garden-strip{position:fixed;left:0;right:0;bottom:0;height:210px;z-index:1;
+  pointer-events:none;overflow:hidden;
+  transition:opacity 1.8s ease}
+body.tod-dusk .garden-strip{opacity:.8}
+body.tod-night .garden-strip{opacity:.62}
+.garden-strip .flower{bottom:4px}
+.garden-strip .blade{bottom:4px}
+
+/* ─────────── falling petals ─────────── */
+.petals{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.petal{position:absolute;top:-24px;width:11px;height:13px;
+  border-radius:82% 18% 82% 18%;
+  animation:petalFall var(--dur,14s) linear forwards}
+@keyframes petalFall{
+  0%{transform:translate3d(0,-30px,0) rotate(0deg);opacity:0}
+  8%{opacity:.9}
+  50%{transform:translate3d(var(--sway,40px),46vh,0) rotate(180deg)}
+  100%{transform:translate3d(0,108vh,0) rotate(400deg);opacity:.15}
+}
+
+/* ─────────── butterflies ─────────── */
+.butterflies{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.butterfly{position:absolute;width:26px;
+  animation:flit var(--dur,20s) linear forwards}
+.butterfly svg{display:block;width:100%;height:auto;image-rendering:pixelated}
+.butterfly .wingL,.butterfly .wingR{transform-box:fill-box;transform-origin:right center;
+  animation:flapL .16s steps(2,end) infinite alternate}
+.butterfly .wingR{transform-origin:left center;animation-name:flapR}
+@keyframes flapL{from{transform:scaleX(1)}to{transform:scaleX(.35)}}
+@keyframes flapR{from{transform:scaleX(1)}to{transform:scaleX(.35)}}
+@keyframes flit{
+  0%{transform:translate3d(-60px,0,0)}
+  20%{transform:translate3d(22vw,-9vh,0)}
+  40%{transform:translate3d(44vw,4vh,0)}
+  60%{transform:translate3d(64vw,-7vh,0)}
+  80%{transform:translate3d(84vw,3vh,0)}
+  100%{transform:translate3d(calc(100vw + 60px),-4vh,0)}
+}
+
+/* ─────────── cursor parallax on the world layers ─────────── */
+/* --px / --py are set on <body> by extras.js and inherit down; the
+   fallback lives in the calc so nothing shadows the inherited value */
+.world{transform:translate3d(calc(var(--px,0px) * 1.6), calc(var(--py,0px) * 1.6), 0)}
+.stars{transform:translate3d(calc(var(--px,0px) * 0.7), calc(var(--py,0px) * 0.7), 0)}
+.garden-strip{transform:translate3d(calc(var(--px,0px) * -2.6), 0, 0)}
+
+/* ─────────── heart constellation, for the last chapter ─────────── */
+.constellation{position:fixed;right:6%;top:12%;width:min(280px,26vw);z-index:1;
+  pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+body.tod-night .constellation.show{opacity:.95}
+.constellation svg{display:block;width:100%;height:auto;overflow:visible}
+.constellation .link{fill:none;stroke:rgba(255,240,250,.75);stroke-width:1.2;
+  stroke-dasharray:260;stroke-dashoffset:260}
+.constellation.show .link{animation:drawLink 2.6s ease .5s forwards}
+@keyframes drawLink{to{stroke-dashoffset:0}}
+.constellation .node{fill:#fff;animation:twinkle 2.4s steps(2,end) infinite alternate}
+
+/* ─────────── entrances: things arrive instead of appearing ─────────── */
+@keyframes riseIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+
+.screen.is-active .card,
+.screen.is-active .dialogue,
+.screen.is-active .quiz-card,
+.screen.is-active .result-card,
+.screen.is-active .when-card,
+.screen.is-active .ticket,
+.screen.is-active .scratch-wrap,
+.screen.is-active .places-grid,
+.screen.is-active .yay-wrap{animation:riseIn .55s cubic-bezier(.2,.9,.3,1.2) both}
+
+.screen.is-active .section-title{animation:riseIn .45s cubic-bezier(.2,.9,.3,1.2) both}
+.screen.is-active .section-sub{animation:riseIn .45s cubic-bezier(.2,.9,.3,1.2) .07s both}
+
+.quiz-opt{animation:riseIn .4s cubic-bezier(.2,.9,.3,1.2) both}
+.quiz-opt:nth-child(2){animation-delay:.06s}
+.quiz-opt:nth-child(3){animation-delay:.12s}
+.quiz-opt:nth-child(4){animation-delay:.18s}
+
+.chip{animation:riseIn .38s cubic-bezier(.2,.9,.3,1.2) both}
+.chip:nth-child(2){animation-delay:.05s}
+.chip:nth-child(3){animation-delay:.1s}
+.chip:nth-child(4){animation-delay:.15s}
+
+.ticket-rows>div{animation:riseIn .4s cubic-bezier(.2,.9,.3,1.2) both}
+.ticket-rows>div:nth-child(2){animation-delay:.05s}
+.ticket-rows>div:nth-child(3){animation-delay:.1s}
+.ticket-rows>div:nth-child(4){animation-delay:.15s}
+.ticket-rows>div:nth-child(5){animation-delay:.2s}
+.ticket-rows>div:nth-child(6){animation-delay:.25s}
+.ticket-rows>div:nth-child(7){animation-delay:.3s}
+
+@media (prefers-reduced-motion:reduce){
+  .petal,.butterfly,.star,.constellation .link{animation:none !important}
+  .screen.is-active *{animation-duration:.01ms !important}
+}

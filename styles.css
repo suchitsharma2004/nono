@@ -1,0 +1,677 @@
+/* ─────────── tokens ─────────── */
+:root{
+  --pink-050:#fff5fa;
+  --pink-100:#ffe3f1;
+  --pink-200:#ffc9e3;
+  --pink-300:#ffa9d2;
+  --pink-400:#ff7ab8;
+  --pink-500:#ff4f9f;
+  --pink-600:#e0327f;
+  --plum:#5d2a48;
+  --plum-soft:#8a4a6d;
+  --cream:#fffaf4;
+  --mint:#b8ecdd;
+  --lilac:#d9c6ff;
+  --butter:#ffe9a8;
+  --pixel:"Press Start 2P",ui-monospace,monospace;
+  --body:"Quicksand",system-ui,sans-serif;
+  --ink:#3d1d31;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--body);
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 700px at 15% -10%, #fff 0%, transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, var(--pink-100) 0%, transparent 55%),
+    radial-gradient(800px 800px at 50% 120%, var(--lilac) 0%, transparent 60%),
+    linear-gradient(170deg, var(--pink-050), var(--pink-200));
+  min-height:100%;
+  overflow-x:hidden;
+  cursor:url("cursor.svg") 4 4, auto;
+}
+
+/* ─────────── background decor ─────────── */
+.sky{position:fixed;top:-140px;left:-140px;width:calc(100% + 280px);height:calc(100% + 280px);
+  pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(rgba(255,255,255,.75) 2px, transparent 2px),
+    radial-gradient(rgba(255,255,255,.45) 2px, transparent 2px);
+  background-size:90px 90px, 140px 140px;
+  background-position:0 0, 45px 60px;
+  animation:drift 50s linear infinite;
+  will-change:transform;
+  opacity:.7;
+}
+@keyframes drift{to{transform:translate3d(90px,140px,0)}}
+
+.hearts{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.float-heart{position:absolute;bottom:-40px;font-size:18px;opacity:.65;
+  animation:rise linear forwards;will-change:transform,opacity}
+@keyframes rise{
+  0%{transform:translateY(0) rotate(0deg) scale(.7);opacity:0}
+  10%{opacity:.7}
+  100%{transform:translateY(-115vh) rotate(var(--spin,240deg)) scale(1.1);opacity:0}
+}
+#confetti{position:fixed;inset:0;z-index:9997;pointer-events:none}
+
+/* ─────────── chrome ─────────── */
+.music-btn{
+  position:fixed;top:14px;right:14px;z-index:60;
+  font-family:var(--pixel);font-size:9px;line-height:1.6;
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;border:3px solid var(--plum);border-radius:14px;
+  background:var(--cream);color:var(--plum);
+  box-shadow:0 4px 0 var(--plum);cursor:inherit;
+  transition:transform .12s ease, box-shadow .12s ease, background .2s;
+}
+.music-btn:hover{transform:translateY(-2px);background:var(--pink-100)}
+.music-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--plum)}
+.music-btn[aria-pressed="true"]{background:var(--pink-300)}
+.music-btn[aria-pressed="true"] .note{animation:noteBounce .6s ease-in-out infinite alternate}
+@keyframes noteBounce{to{transform:translateY(-4px) rotate(12deg)}}
+
+.progress{position:fixed;top:18px;left:14px;z-index:60;display:flex;gap:7px}
+.pip{width:12px;height:12px;background:#fff;border:3px solid var(--plum);
+  transform:rotate(45deg);transition:background .3s, transform .3s}
+.pip.on{background:var(--pink-500);transform:rotate(45deg) scale(1.15)}
+
+.stage{position:relative;z-index:5;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:78px 18px 70px}
+
+.screen{display:none;width:100%;max-width:960px;animation:screenIn .5s cubic-bezier(.2,.9,.3,1.2) both}
+.screen.is-active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+
+.footer{position:relative;z-index:5;text-align:center;padding:0 20px 26px;
+  font-size:12px;letter-spacing:.02em;color:var(--plum-soft)}
+
+/* ─────────── pixel sprites ─────────── */
+.sprite{width:112px;image-rendering:pixelated}
+.sprite svg{display:block;width:100%;height:auto;image-rendering:pixelated}
+.sprite.tiny{width:56px}
+.bob{animation:bob 1.6s steps(2,end) infinite;will-change:transform}
+.bob.delay{animation-delay:.8s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.pixel-stage{position:relative;display:flex;align-items:flex-end;justify-content:center;
+  gap:min(18vw,150px);padding:12px 0 26px;min-height:190px}
+.pixel-stage.tight{gap:0;min-height:170px}
+.sprite-wrap{position:relative;display:grid;justify-items:center}
+.sprite-wrap.right .sprite svg{transform:scaleX(-1)}
+.shadow{width:70px;height:12px;border-radius:50%;background:rgba(93,42,72,.14);
+  margin-top:2px;animation:shadowPulse 1.6s steps(2,end) infinite}
+@keyframes shadowPulse{0%,100%{transform:scale(1)}50%{transform:scale(.86)}}
+.ground{position:absolute;left:50%;bottom:10px;translate:-50% 0;width:min(100%,620px);height:8px;
+  background:repeating-linear-gradient(90deg,var(--pink-400) 0 12px,var(--pink-300) 12px 24px);
+  border-radius:4px;opacity:.85}
+
+/* ─────────── dialogue box ─────────── */
+.dialogue{
+  position:relative;background:var(--cream);border:4px solid var(--plum);border-radius:18px;
+  padding:22px 22px 46px;box-shadow:0 8px 0 var(--plum), 0 18px 30px rgba(93,42,72,.15);
+  max-width:640px;margin:0 auto;
+}
+.dialogue::before{content:"";position:absolute;top:-16px;left:44px;width:24px;height:24px;
+  background:var(--cream);border-left:4px solid var(--plum);border-top:4px solid var(--plum);
+  transform:rotate(45deg);border-radius:4px}
+.dialogue-name{font-family:var(--pixel);font-size:10px;color:var(--pink-600);margin-bottom:12px;letter-spacing:.06em}
+.dialogue-text{font-family:var(--pixel);font-size:13px;line-height:2.1;margin:0;min-height:5.2em;color:var(--ink)}
+.caret{display:inline-block;width:.7em;background:var(--pink-500);
+  animation:blink .7s steps(1,end) infinite;color:transparent}
+@keyframes blink{50%{opacity:0}}
+.dialogue-next{position:absolute;right:16px;bottom:12px;font-family:var(--pixel);font-size:10px;
+  border:0;background:none;color:var(--pink-600);cursor:inherit;padding:8px;
+  animation:nudge 1s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(4px)}}
+.hint{text-align:center;font-size:12px;color:var(--plum-soft);margin:14px 0 0}
+
+/* ─────────── the ask card ─────────── */
+.card{
+  position:relative;background:var(--cream);border:4px solid var(--plum);border-radius:26px;
+  padding:34px 26px 30px;text-align:center;max-width:640px;margin:0 auto;
+  box-shadow:0 10px 0 var(--plum), 0 16px 24px rgba(93,42,72,.13);
+  rotate:-.6deg;
+}
+.tape{position:absolute;width:110px;height:30px;background:rgba(255,196,224,.75);
+  border:2px dashed rgba(255,255,255,.9);box-shadow:0 2px 6px rgba(93,42,72,.12)}
+.tape-tl{top:-16px;left:-26px;rotate:-24deg}
+.tape-br{bottom:-16px;right:-26px;rotate:-24deg}
+
+.mini-sprites{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:8px}
+.mini-sprites .sprite:last-of-type svg{transform:scaleX(-1)}
+.pulse-heart{font-size:26px;animation:beat .9s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}30%{transform:scale(1.35)}60%{transform:scale(.95)}}
+
+.q-title{font-family:var(--pixel);font-size:clamp(17px,4.6vw,30px);line-height:1.75;
+  margin:6px 0 12px;color:var(--plum)}
+.glow{color:var(--pink-500);text-shadow:3px 3px 0 var(--pink-200)}
+.q-sub{font-size:15px;font-weight:700;color:var(--plum-soft);margin:0 0 24px;min-height:2.4em}
+
+.btn-row{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}
+.btn{
+  position:relative;
+  font-family:var(--pixel);font-size:13px;letter-spacing:.04em;
+  padding:18px 26px;border:4px solid var(--plum);border-radius:18px;
+  background:var(--pink-400);color:#fff;cursor:inherit;
+  box-shadow:0 6px 0 var(--plum);transition:transform .14s ease, box-shadow .14s ease, background .2s;
+  text-shadow:0 2px 0 rgba(93,42,72,.35);
+}
+.btn:hover{background:var(--pink-500);transform:translateY(-3px);box-shadow:0 9px 0 var(--plum)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--plum)}
+.btn-yes{background:var(--pink-500);transition:transform .25s cubic-bezier(.2,.9,.3,1.4), box-shadow .2s, background .2s}
+/* the ask screen breaks out to the full viewport, so the arena is huge */
+#scene-ask{max-width:none;width:100%}
+
+/* the invisible rectangle the "no" button roams inside */
+.arena{position:relative;
+  width:calc(100vw - 56px);max-width:1700px;margin-inline:auto;
+  min-height:calc(100vh - 190px);
+  display:flex;align-items:center;justify-content:center}
+.arena.debug{outline:3px dashed rgba(224,50,127,.5);outline-offset:-3px;border-radius:18px}
+.arena.debug::after{content:"arena";position:absolute;top:6px;left:10px;
+  font-family:var(--pixel);font-size:8px;color:var(--pink-600)}
+
+.btn-no{background:var(--cream);color:var(--plum-soft);text-shadow:none;
+  position:absolute;left:0;top:0;
+  width:auto;height:auto;padding:16px 20px;font-size:12px;
+  /* no transition on position — movement is driven per-frame in JS */
+  transition:opacity .3s ease;
+  pointer-events:none;           /* it can never be hovered or clicked */
+  will-change:transform;
+  z-index:70;white-space:nowrap;
+}
+/* the spacer left behind in the button row, so YES stays put */
+.no-slot{position:relative;width:150px;height:64px;pointer-events:none}
+.tiny-note{font-size:12px;color:var(--plum-soft);margin:22px 0 0;opacity:.85}
+
+/* ─────────── celebration ─────────── */
+.yay-wrap{text-align:center}
+.big-hearts{display:flex;justify-content:center;gap:14px;font-size:34px}
+.big-hearts span:nth-child(1){animation:beat 1s ease-in-out infinite}
+.big-hearts span:nth-child(2){animation:beat 1s ease-in-out .2s infinite;font-size:44px}
+.big-hearts span:nth-child(3){animation:beat 1s ease-in-out .4s infinite}
+.yay-title{font-family:var(--pixel);font-size:clamp(20px,6vw,44px);color:var(--pink-600);
+  margin:14px 0 0;letter-spacing:.04em;
+  text-shadow:4px 4px 0 #fff, 8px 8px 0 var(--pink-200);
+  animation:wobble 2.4s ease-in-out infinite}
+@keyframes wobble{0%,100%{rotate:-1.4deg}50%{rotate:1.4deg}}
+.couple{display:flex;align-items:flex-end;justify-content:center;gap:4px}
+.couple .sprite:last-of-type svg{transform:scaleX(-1)}
+.hand-heart{font-size:22px;align-self:center;animation:beat .8s ease-in-out infinite}
+.yay-sub{font-size:15px;font-weight:700;color:var(--plum-soft);margin:0 0 26px}
+.btn-next{background:var(--pink-500)}
+
+/* ─────────── places ─────────── */
+.section-title{font-family:var(--pixel);font-size:clamp(15px,4vw,24px);text-align:center;
+  color:var(--plum);margin:0 0 12px;line-height:1.7}
+.section-sub{text-align:center;font-size:14px;font-weight:700;color:var(--plum-soft);margin:0 0 30px;line-height:1.7}
+
+.places-grid{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));align-items:start}
+
+.polaroid{position:relative;perspective:1200px;background:none;border:0;padding:0;cursor:inherit;
+  animation:driftCard 6s ease-in-out infinite;will-change:transform;contain:layout paint}
+.polaroid:nth-child(2){animation-delay:-2s}
+.polaroid:nth-child(3){animation-delay:-4s}
+@keyframes driftCard{0%,100%{transform:translateY(0) rotate(var(--tilt,-1.5deg))}
+  50%{transform:translateY(-8px) rotate(calc(var(--tilt,-1.5deg) * -1))}}
+
+.flipper{position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.9,.3,1.15);
+  min-height:406px;will-change:transform}
+.polaroid:hover .flipper,.polaroid.flipped .flipper{transform:rotateY(180deg)}
+
+.face{position:absolute;inset:0;backface-visibility:hidden;
+  background:var(--cream);border:4px solid var(--plum);border-radius:18px;
+  box-shadow:0 8px 0 var(--plum), 0 14px 18px rgba(93,42,72,.12);
+  padding:16px;display:flex;flex-direction:column}
+.face.back{transform:rotateY(180deg);background:var(--pink-050)}
+
+.photo{position:relative;height:186px;border:3px solid var(--plum);border-radius:12px;
+  display:grid;place-items:center;font-size:64px;overflow:hidden;
+  background-image:
+    linear-gradient(45deg,rgba(255,255,255,.55) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.55) 75%),
+    linear-gradient(45deg,rgba(255,255,255,.55) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.55) 75%);
+  background-size:22px 22px;background-position:0 0,11px 11px}
+.photo .emoji{animation:beat 2.6s ease-in-out infinite}
+.badge{position:absolute;top:8px;left:8px;font-family:var(--pixel);font-size:8px;
+  background:var(--plum);color:#fff;padding:6px 8px;border-radius:8px;letter-spacing:.06em}
+.place-name{font-family:var(--pixel);font-size:12px;line-height:1.8;color:var(--plum);margin:16px 0 8px}
+.place-blurb{font-size:13.5px;font-weight:700;color:var(--plum-soft);margin:0 0 12px;line-height:1.65}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.tag{font-size:11px;font-weight:700;background:var(--pink-100);border:2px solid var(--pink-300);
+  color:var(--pink-600);padding:4px 8px;border-radius:999px}
+.flip-cue{font-family:var(--pixel);font-size:8px;color:var(--pink-600);margin:10px 0 0;text-align:center}
+
+.face.back h4{font-family:var(--pixel);font-size:10px;color:var(--pink-600);margin:2px 0 12px;letter-spacing:.05em;line-height:1.8}
+.plan{list-style:none;padding:0;margin:0 0 14px;font-size:13.5px;font-weight:700;color:var(--plum);line-height:1.7}
+.plan li{display:flex;gap:8px;margin-bottom:7px;text-align:left}
+.plan li::before{content:"✦";color:var(--pink-400)}
+.back-actions{margin-top:auto;display:grid;gap:10px}
+.btn-sm{font-family:var(--pixel);font-size:10px;padding:13px 12px;border:3px solid var(--plum);
+  border-radius:14px;background:var(--pink-400);color:#fff;box-shadow:0 5px 0 var(--plum);
+  cursor:inherit;text-decoration:none;display:block;text-align:center;line-height:1.5;
+  transition:transform .14s ease, box-shadow .14s ease, background .2s;text-shadow:0 2px 0 rgba(93,42,72,.3)}
+.btn-sm:hover{transform:translateY(-2px);box-shadow:0 7px 0 var(--plum);background:var(--pink-500)}
+.btn-sm.alt{background:var(--cream);color:var(--plum);text-shadow:none}
+.btn-sm.alt:hover{background:var(--pink-100)}
+
+/* ─────────── ticket ─────────── */
+.ticket{position:relative;max-width:500px;margin:0 auto;background:var(--cream);
+  border:4px solid var(--plum);border-radius:22px;padding:26px 26px 24px;text-align:center;
+  box-shadow:0 10px 0 var(--plum), 0 16px 24px rgba(93,42,72,.13);rotate:-.8deg}
+.ticket-top{display:flex;justify-content:space-between;font-family:var(--pixel);font-size:8px;
+  color:var(--plum-soft);letter-spacing:.08em}
+.ticket-title{font-family:var(--pixel);font-size:clamp(13px,3.6vw,18px);line-height:1.8;
+  color:var(--pink-600);margin:16px 0 18px}
+.perf{height:0;border-top:4px dashed var(--pink-300);margin:0 -8px 18px}
+.ticket-rows{margin:0 0 20px;display:grid;gap:11px;text-align:left}
+.ticket-rows>div{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.ticket-rows dt{font-family:var(--pixel);font-size:8.5px;color:var(--plum-soft);letter-spacing:.06em}
+.ticket-rows dd{margin:0;font-size:14px;font-weight:700;color:var(--plum);text-align:right}
+.ticket-link{display:inline-block;font-family:var(--pixel);font-size:10px;color:#fff;
+  background:var(--pink-500);border:3px solid var(--plum);border-radius:14px;padding:13px 18px;
+  text-decoration:none;box-shadow:0 5px 0 var(--plum);transition:transform .14s ease}
+.ticket-link:hover{transform:translateY(-2px)}
+.ticket-foot{font-size:12px;color:var(--plum-soft);margin:16px 0 6px}
+.ticket-sprites{display:flex;justify-content:center;gap:10px;margin-bottom:10px}
+.ticket-sprites .sprite:last-of-type svg{transform:scaleX(-1)}
+.btn-ghost{background:var(--cream);color:var(--plum);font-size:9.5px;padding:12px 14px;
+  text-shadow:none;box-shadow:0 4px 0 var(--plum)}
+.btn-ghost:hover{background:var(--pink-100)}
+
+/* ─────────── responsive ─────────── */
+@media (max-width:560px){
+  .stage{padding:86px 14px 60px}
+  .pixel-stage{gap:14vw}
+  .sprite{width:88px}
+  .dialogue{padding:18px 16px 44px}
+  .dialogue-text{font-size:11px;line-height:2.2}
+  .no-slot{width:110px;height:56px}
+  .btn-no{font-size:10px;padding:13px 15px}
+  .arena{min-height:min(70vh,520px)}
+  .btn{font-size:11px;padding:15px 18px}
+  .music-label{display:none}
+  .flipper{min-height:420px}
+}
+@media (prefers-reduced-motion:reduce){
+  .sky,.bob,.shadow,.polaroid,.yay-title,.float-heart,.pulse-heart,
+  .big-hearts span,.hand-heart,.dialogue-next,.photo .emoji{animation:none !important}
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   additions: world backdrop, boot screen, pixel wipe, polish
+   ══════════════════════════════════════════════════════════════ */
+
+::selection{background:var(--pink-300);color:var(--plum)}
+html{scrollbar-color:var(--pink-400) var(--pink-100);scrollbar-width:thin}
+
+/* ─────────── parallax pixel world ─────────── */
+.world{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.cloud{position:absolute;width:120px;height:36px;opacity:.75;
+  background:
+    linear-gradient(#fff,#fff) 24px 0/48px 12px no-repeat,
+    linear-gradient(#fff,#fff) 12px 12px/96px 12px no-repeat,
+    linear-gradient(#fff,#fff) 0 24px/120px 12px no-repeat;
+  will-change:transform}
+.cloud.c1{top:12%;animation:cloudDrift 46s linear infinite}
+.cloud.c2{top:26%;animation:cloudDrift 68s linear 8s infinite;opacity:.55}
+.cloud.c3{top:6%;animation:cloudDrift 88s linear 22s infinite;opacity:.5}
+@keyframes cloudDrift{
+  from{transform:translateX(-180px) scale(1)}
+  to{transform:translateX(calc(100vw + 200px)) scale(1.15)}
+}
+
+.hills{position:absolute;left:0;right:0;bottom:0;height:132px;opacity:.45;
+  background:
+    linear-gradient(var(--pink-300),var(--pink-300)) 0 92px/100% 40px no-repeat,
+    linear-gradient(var(--pink-300),var(--pink-300)) 6% 68px/22% 24px no-repeat,
+    linear-gradient(var(--pink-300),var(--pink-300)) 11% 44px/12% 24px no-repeat,
+    linear-gradient(var(--pink-200),var(--pink-200)) 44% 68px/26% 24px no-repeat,
+    linear-gradient(var(--pink-200),var(--pink-200)) 52% 44px/12% 24px no-repeat,
+    linear-gradient(var(--pink-300),var(--pink-300)) 78% 68px/18% 24px no-repeat,
+    linear-gradient(var(--pink-300),var(--pink-300)) 84% 44px/8% 24px no-repeat}
+
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(93,42,72,.13) 100%)}
+
+/* ─────────── boot / title screen ─────────── */
+.boot{position:fixed;inset:0;z-index:200;display:grid;place-items:center;
+  background:linear-gradient(170deg,var(--pink-100),var(--pink-300));
+  transition:opacity .45s ease, visibility .45s}
+.boot.gone{opacity:0;visibility:hidden}
+.boot-inner{text-align:center;padding:24px}
+.boot-tag{font-family:var(--pixel);font-size:9px;letter-spacing:.14em;color:var(--plum-soft);
+  margin:0 0 18px;text-transform:uppercase}
+.boot-title{font-family:var(--pixel);font-size:clamp(22px,4.6vw,40px);line-height:1.7;
+  color:var(--plum);margin:0 0 6px;
+  text-shadow:4px 4px 0 #fff, 8px 8px 0 var(--pink-200);
+  animation:bootIn .7s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes bootIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+.boot-sprites{display:flex;align-items:center;justify-content:center;gap:26px;margin:26px 0 30px}
+.boot-sprites .sprite{width:86px}
+.boot-sprites .sprite:last-of-type svg{transform:scaleX(-1)}
+.boot-heart{font-size:24px;animation:beat .9s ease-in-out infinite}
+
+.loadbar{width:min(360px,72vw);height:22px;margin:0 auto;background:var(--cream);
+  border:4px solid var(--plum);border-radius:6px;box-shadow:0 4px 0 var(--plum);
+  padding:3px;overflow:hidden}
+.loadfill{height:100%;width:0%;border-radius:2px;
+  background:repeating-linear-gradient(90deg,var(--pink-500) 0 8px,var(--pink-400) 8px 16px)}
+.loadtext{font-family:var(--pixel);font-size:9px;color:var(--plum-soft);margin:14px 0 0;letter-spacing:.06em}
+.boot-start{font-family:var(--pixel);font-size:11px;color:var(--pink-600);margin:14px 0 0;
+  animation:blinkSlow 1.1s steps(1,end) infinite}
+@keyframes blinkSlow{50%{opacity:.15}}
+
+/* ─────────── pixel wipe between scenes ─────────── */
+.wipe{position:fixed;inset:0;z-index:150;pointer-events:none;
+  display:grid;grid-template-columns:repeat(var(--cols,16),1fr);
+  grid-template-rows:repeat(var(--rows,9),1fr)}
+.wipe i{display:block;background:var(--pink-400);transform:scale(0);
+  transition:transform .24s ease;will-change:transform}
+.wipe.in i{transform:scale(1.4)}
+.wipe.out i{transform:scale(0)}
+
+/* ─────────── shine sweep on the big buttons ─────────── */
+.btn{overflow:hidden;isolation:isolate}
+.btn>span{position:relative;z-index:2}
+/* animate transform, not `left` — no layout work per frame */
+.btn::after{content:"";position:absolute;top:-60%;left:0;width:55%;height:220%;z-index:1;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);
+  animation:sheen 3.6s ease-in-out infinite;will-change:transform}
+.btn-no::after{display:none}
+@keyframes sheen{
+  0%{transform:translateX(-190%) skewX(-18deg)}
+  50%,100%{transform:translateX(320%) skewX(-18deg)}
+}
+
+/* ─────────── the idle nudge bubble ─────────── */
+.mini-sprites{position:relative}
+.nudge-bubble{position:absolute;left:50%;top:-10px;
+  transform:translate(-50%,-100%);
+  background:var(--cream);border:3px solid var(--plum);border-radius:12px;
+  padding:9px 12px;font-family:var(--pixel);font-size:9px;line-height:1.7;color:var(--plum);
+  box-shadow:0 4px 0 var(--plum);white-space:nowrap;z-index:80;
+  animation:bubbleIn .3s cubic-bezier(.2,.9,.3,1.4) both}
+.nudge-bubble::after{content:"";position:absolute;bottom:-9px;left:24px;width:12px;height:12px;
+  background:var(--cream);border-right:3px solid var(--plum);border-bottom:3px solid var(--plum);
+  transform:rotate(45deg)}
+@keyframes bubbleIn{from{opacity:0;transform:translate(-50%,-100%) translateY(6px) scale(.92)}
+  to{opacity:1;transform:translate(-50%,-100%)}}
+
+/* ─────────── the couple walking together ─────────── */
+.couple .walk-r{animation:bob 1.6s steps(2,end) infinite, walkR 1.4s steps(7,end) both}
+.couple .walk-l{animation:bob 1.6s steps(2,end) .8s infinite, walkL 1.4s steps(7,end) both}
+@keyframes walkR{from{translate:-130px 0}to{translate:0 0}}
+@keyframes walkL{from{translate:130px 0}to{translate:0 0}}
+.couple .hand-heart{opacity:0;animation:popHeart .5s cubic-bezier(.2,.9,.3,1.6) 1.4s both}
+@keyframes popHeart{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+
+/* ─────────── eyes that follow the cursor ─────────── */
+.eyes{transition:transform .14s ease-out}
+
+/* ─────────── ticket stamp ─────────── */
+.ticket{overflow:hidden}
+.stamp{position:absolute;right:-4px;bottom:56px;width:104px;height:104px;
+  display:grid;place-items:center;text-align:center;
+  border:3px dashed var(--pink-400);border-radius:50%;
+  color:var(--pink-500);font-family:var(--pixel);font-size:7.5px;line-height:1.9;
+  letter-spacing:.06em;rotate:-14deg;opacity:.75}
+.stamp::before{content:"";position:absolute;inset:7px;border:2px dotted var(--pink-300);border-radius:50%}
+
+/* ─────────── optional photos on the place cards ─────────── */
+.photo.has-img{background:var(--plum);padding:0}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .emoji.small{font-size:32px;position:absolute;right:8px;bottom:4px}
+
+
+/* ══════════════════════════════════════════════════════════════
+   chapters · compatibility test · scratch card · when · share
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─────────── chapter title card ─────────── */
+.chapter{display:none}                    /* only ever visible mid-wipe */
+.chapter.on{position:fixed;inset:0;z-index:160;display:grid;place-content:center;
+  text-align:center;pointer-events:none}
+.chapter-num{font-family:var(--pixel);font-size:10px;letter-spacing:.24em;color:var(--cream);
+  margin:0 0 14px;text-transform:uppercase;
+  animation:chapIn .5s cubic-bezier(.2,.9,.3,1.3) both}
+.chapter-name{font-family:var(--pixel);font-size:clamp(15px,3.4vw,26px);line-height:1.7;
+  color:#fff;margin:0;text-shadow:3px 3px 0 var(--plum);
+  animation:chapIn .5s cubic-bezier(.2,.9,.3,1.3) .07s both}
+@keyframes chapIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ─────────── progress pips (built in JS) ─────────── */
+.pip{position:relative}
+.pip::after{content:attr(data-label);position:absolute;top:22px;left:50%;
+  transform:translateX(-50%) rotate(-45deg);transform-origin:center;
+  font-family:var(--pixel);font-size:7px;color:var(--plum-soft);white-space:nowrap;
+  opacity:0;transition:opacity .2s;pointer-events:none}
+.progress:hover .pip::after{opacity:.9}
+
+/* ─────────── compatibility test ─────────── */
+.quiz-card,.result-card,.when-card{
+  position:relative;max-width:620px;margin:0 auto;background:var(--cream);
+  border:4px solid var(--plum);border-radius:22px;padding:26px 26px 28px;
+  box-shadow:0 10px 0 var(--plum), 0 16px 24px rgba(93,42,72,.13)}
+
+.quiz-progress{display:flex;align-items:center;gap:14px;
+  font-family:var(--pixel);font-size:8px;color:var(--plum-soft);letter-spacing:.06em;
+  margin-bottom:20px}
+.quiz-bar{flex:1;height:12px;background:var(--pink-100);border:3px solid var(--plum);
+  border-radius:8px;overflow:hidden}
+.quiz-fill{height:100%;width:0;transition:width .45s cubic-bezier(.2,.9,.3,1.2);
+  background:repeating-linear-gradient(90deg,var(--pink-500) 0 8px,var(--pink-400) 8px 16px)}
+
+.quiz-q{font-family:var(--pixel);font-size:clamp(12px,2.4vw,15px);line-height:2;
+  color:var(--plum);margin:0 0 22px;text-align:center;min-height:4em}
+.quiz-options{display:grid;gap:12px}
+.quiz-opt{display:flex;align-items:center;gap:14px;text-align:left;
+  font-family:var(--body);font-size:15px;font-weight:700;color:var(--plum);
+  background:var(--pink-050);border:3px solid var(--plum);border-radius:16px;
+  padding:14px 16px;cursor:inherit;box-shadow:0 4px 0 var(--plum);
+  transition:transform .14s ease, box-shadow .14s ease, background .18s}
+.quiz-opt:hover{background:var(--pink-100);transform:translateY(-3px);box-shadow:0 7px 0 var(--plum)}
+.quiz-opt:active{transform:translateY(2px);box-shadow:0 2px 0 var(--plum)}
+.quiz-opt.chosen{background:var(--pink-300);transform:translateY(2px);box-shadow:0 2px 0 var(--plum)}
+.quiz-opt .oe{font-size:26px;line-height:1}
+.quiz-verdict{font-family:var(--pixel);font-size:9px;line-height:1.9;color:var(--pink-600);
+  text-align:center;margin:18px 0 0;animation:chapIn .3s both}
+
+/* result meter */
+.result-card{text-align:center;margin-top:0}
+.meter{position:relative;height:34px;background:var(--pink-100);border:4px solid var(--plum);
+  border-radius:12px;overflow:hidden;margin-bottom:20px}
+.meter-fill{height:100%;width:0;transition:width 1.6s cubic-bezier(.3,.9,.2,1);
+  background:repeating-linear-gradient(90deg,var(--pink-500) 0 10px,var(--pink-400) 10px 20px)}
+.meter-num{position:absolute;inset:0;display:grid;place-items:center;
+  font-family:var(--pixel);font-size:11px;color:var(--plum);
+  text-shadow:0 1px 0 rgba(255,255,255,.85)}
+.result-title{font-family:var(--pixel);font-size:clamp(13px,2.6vw,17px);color:var(--pink-600);
+  margin:0 0 12px;line-height:1.8}
+.result-note{font-size:15px;font-weight:700;color:var(--plum-soft);margin:0 0 18px;line-height:1.7}
+.result-list{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:9px;text-align:left}
+.result-list li{display:flex;gap:10px;font-size:14px;font-weight:700;color:var(--plum);
+  background:var(--pink-050);border:2px solid var(--pink-200);border-radius:12px;padding:10px 12px}
+
+/* ─────────── scratch card ─────────── */
+.scratch-wrap{position:relative;width:min(620px,92vw);margin:0 auto 26px;
+  border:4px solid var(--plum);border-radius:20px;overflow:hidden;
+  box-shadow:0 10px 0 var(--plum), 0 16px 24px rgba(93,42,72,.13);
+  aspect-ratio:620/300;background:var(--cream)}
+.scratch-under{position:absolute;inset:0;display:grid;place-items:center;padding:28px;
+  background:
+    radial-gradient(circle at 20% 20%, var(--butter) 0 2px, transparent 3px) 0 0/26px 26px,
+    linear-gradient(160deg,var(--cream),var(--pink-100))}
+.scratch-line{font-family:var(--pixel);font-size:clamp(11px,2vw,14px);line-height:2.2;
+  color:var(--plum);text-align:center;margin:0}
+.scratch-canvas{position:absolute;inset:0;width:100%;height:100%;
+  cursor:crosshair;touch-action:none}
+.scratch-hint{position:absolute;left:50%;top:50%;translate:-50% -50%;
+  font-family:var(--pixel);font-size:11px;color:var(--cream);letter-spacing:.1em;
+  pointer-events:none;animation:blinkSlow 1.4s steps(1,end) infinite}
+.scratch-wrap.done .scratch-hint,.scratch-wrap.done .scratch-canvas{opacity:0;transition:opacity .5s}
+.scratch-wrap.done .scratch-canvas{pointer-events:none}
+
+/* ─────────── when? ─────────── */
+.when-card{text-align:center}
+.when-label{font-family:var(--pixel);font-size:9px;letter-spacing:.08em;color:var(--pink-600);
+  margin:6px 0 14px;text-transform:uppercase}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:26px}
+.chip{font-family:var(--body);font-size:14px;font-weight:700;color:var(--plum);
+  background:var(--pink-050);border:3px solid var(--plum);border-radius:999px;
+  padding:11px 16px;cursor:inherit;box-shadow:0 4px 0 var(--plum);
+  transition:transform .14s ease, box-shadow .14s ease, background .18s}
+.chip:hover{background:var(--pink-100);transform:translateY(-3px);box-shadow:0 7px 0 var(--plum)}
+.chip.on{background:var(--pink-400);color:#fff;text-shadow:0 2px 0 rgba(93,42,72,.3);
+  transform:translateY(2px);box-shadow:0 2px 0 var(--plum)}
+.when-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.btn:disabled{opacity:.45;box-shadow:0 3px 0 var(--plum);transform:none;cursor:not-allowed}
+.btn:disabled:hover{background:var(--pink-400);transform:none}
+.btn-next:disabled:hover{background:var(--pink-500)}
+
+/* ─────────── ticket share row ─────────── */
+.ticket-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ticket-link.alt{background:var(--cream);color:var(--plum);border:3px solid var(--plum);
+  font-family:var(--pixel);font-size:10px;cursor:inherit}
+.ticket-link.alt:hover{background:var(--pink-100)}
+
+/* ─────────── easter eggs ─────────── */
+.spin-party .sprite{animation:spinParty .7s linear infinite !important}
+@keyframes spinParty{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:26px;translate:-50% 0;z-index:120;
+  font-family:var(--pixel);font-size:10px;color:var(--plum);
+  background:var(--cream);border:3px solid var(--plum);border-radius:14px;
+  padding:12px 16px;box-shadow:0 5px 0 var(--plum);
+  animation:toastIn .3s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+
+/* ─────────── per-scene chapter heading (above the cards) ─────────── */
+.chapter-head{display:flex;align-items:center;justify-content:center;gap:12px;
+  margin:0 auto 22px;max-width:640px}
+.chapter-head span{font-family:var(--pixel);font-size:8.5px;letter-spacing:.14em;
+  color:var(--pink-600);text-transform:uppercase;white-space:nowrap}
+.chapter-head i{flex:1;height:0;border-top:3px dotted var(--pink-300);max-width:90px}
+#scene-ask .chapter-head{position:absolute;top:34px;left:50%;transform:translateX(-50%);
+  margin:0;z-index:5}
+
+
+/* ══════════════════════════════════════════════════════════════
+   cold open — a pixel garden grows out of a black screen
+   ══════════════════════════════════════════════════════════════ */
+
+.opening{position:fixed;inset:0;z-index:400;overflow:hidden;
+  background:#0b0510;
+  transition:opacity .9s ease, visibility .9s}
+.opening.lit{background:#1a0a20}
+.opening.gone{opacity:0;visibility:hidden}
+
+/* the warm dawn that rises behind the flowers */
+.dawn{position:absolute;inset:0;opacity:0;
+  background:
+    radial-gradient(120% 78% at 50% 104%, #ffd6ea 0%, #ff7ab8 26%, rgba(224,50,127,.42) 52%, transparent 78%),
+    radial-gradient(60% 40% at 20% 100%, rgba(255,233,168,.55), transparent 70%),
+    radial-gradient(60% 40% at 82% 100%, rgba(217,198,255,.5), transparent 70%);
+  transition:opacity 2.4s ease}
+.opening.lit .dawn{opacity:1}
+
+/* the ground */
+.soil{position:absolute;left:50%;bottom:0;width:0;height:74px;translate:-50% 0;
+  background:
+    repeating-linear-gradient(90deg, #3a1b2c 0 8px, #452034 8px 16px);
+  border-top:6px solid #5d2a48;
+  transition:width 1s cubic-bezier(.3,.9,.2,1)}
+.opening.sprouting .soil{width:100%}
+
+.garden{position:absolute;inset:0}
+
+/* ── one flower ── */
+.flower{position:absolute;bottom:64px;width:0;
+  transform-origin:bottom center;
+  animation:sway var(--sway,4.2s) ease-in-out infinite alternate;
+  animation-delay:var(--delay)}
+@keyframes sway{
+  from{transform:rotate(calc(var(--tilt,1) * -1.6deg))}
+  to{transform:rotate(calc(var(--tilt,1) * 1.6deg))}
+}
+
+/* the grow wrapper: scales up out of the soil */
+.grow{position:absolute;bottom:0;left:0;transform:scaleY(0);transform-origin:bottom center;
+  animation:sprout 1.15s cubic-bezier(.2,.85,.25,1) var(--delay) forwards;will-change:transform}
+@keyframes sprout{
+  0%{transform:scaleY(0) scaleX(.7)}
+  70%{transform:scaleY(1.06) scaleX(1.02)}
+  100%{transform:scaleY(1) scaleX(1)}
+}
+
+.stem{position:absolute;bottom:0;left:calc(var(--sw) / -2);width:var(--sw);height:var(--h);
+  background:linear-gradient(180deg,var(--stem2) 0 30%,var(--stem) 100%);
+  box-shadow:inset -2px 0 0 rgba(0,0,0,.22)}
+
+.leaf{position:absolute;width:var(--lw);height:var(--lh);background:var(--stem2);
+  border-radius:70% 10% 70% 10%;transform:scale(0);
+  animation:leafIn .5s cubic-bezier(.2,.9,.3,1.5) forwards;
+  animation-delay:calc(var(--delay) + .55s)}
+.leaf.l{left:calc(var(--lw) * -1);bottom:calc(var(--h) * .34);transform-origin:right center;rotate:-18deg}
+.leaf.r{left:0;bottom:calc(var(--h) * .5);transform-origin:left center;rotate:18deg;
+  animation-delay:calc(var(--delay) + .72s)}
+@keyframes leafIn{from{transform:scale(0)}to{transform:scale(1)}}
+
+.bloom{position:absolute;bottom:var(--h);left:0;translate:-50% 42%;
+  width:var(--bw);transform:scale(0) rotate(-24deg);
+  animation:bloomPop .62s cubic-bezier(.2,.9,.3,1.7) forwards;
+  animation-delay:calc(var(--delay) + 1.02s)}
+/* the glow is a painted gradient, not a blur filter — a filter inside a
+   swaying parent would re-rasterise every frame */
+.bloom::before{content:"";position:absolute;inset:-45%;z-index:-1;
+  background:radial-gradient(circle, rgba(255,175,215,.4) 0%, rgba(255,175,215,.16) 45%, transparent 72%)}
+.bloom svg{display:block;width:100%;height:auto;image-rendering:pixelated;position:relative}
+@keyframes bloomPop{
+  0%{transform:scale(0) rotate(-24deg)}
+  60%{transform:scale(1.18) rotate(4deg)}
+  100%{transform:scale(1) rotate(0deg)}
+}
+
+/* back row, for depth */
+.flower.back{opacity:.5}
+
+/* grass blades */
+.blade{position:absolute;bottom:64px;width:3px;background:#2f6b45;
+  transform:scaleY(0);transform-origin:bottom center;
+  animation:sprout .9s cubic-bezier(.2,.85,.25,1) var(--delay) forwards}
+
+/* drifting pollen / fireflies */
+.mote{position:absolute;width:4px;height:4px;border-radius:50%;
+  background:#fff3c4;box-shadow:0 0 8px 2px rgba(255,243,196,.7);
+  animation:moteRise var(--dur) linear var(--delay) infinite;opacity:0}
+@keyframes moteRise{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  12%{opacity:.9}
+  100%{transform:translateY(-84vh) translateX(var(--drift,20px));opacity:0}
+}
+
+/* the line of text, then the skip hint */
+.opening-line{position:absolute;left:0;right:0;top:26%;margin:0;text-align:center;
+  font-family:var(--pixel);font-size:clamp(11px,2.1vw,15px);line-height:2.2;
+  color:#fff;text-shadow:0 2px 12px rgba(93,42,72,.9), 3px 3px 0 rgba(93,42,72,.55);
+  opacity:0;transition:opacity 1.1s ease;padding:0 20px}
+.opening-line.show{opacity:1}
+
+.skip-hint{position:absolute;right:18px;bottom:18px;margin:0;
+  font-family:var(--pixel);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.5);
+  animation:blinkSlow 2s steps(1,end) infinite}
+
+/* during the cold open, the particle canvas and floating hearts stand down
+   (the canvas sits above everything, so a cursor trail would draw over the
+   black screen) */
+body.cold-open #confetti,
+body.cold-open .hearts,
+body.cold-open .vignette{display:none}
+
+/* the back row stays still and unlit — it is only there for depth */
+.flower.back{animation:none}
+.flower.back .bloom{filter:none}

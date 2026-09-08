@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>a very important question 💗</title>
+<meta name="description" content="a very important question, for a very important person" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💗</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="extras.css" />
+</head>
+<body>
+
+<!-- ░░░ background world ░░░ -->
+<div class="sky" aria-hidden="true"></div>
+<div class="world" aria-hidden="true">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+  <div class="hills"></div>
+</div>
+<div id="hearts" class="hearts" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<!-- ░░░ pixel wipe used between scenes ░░░ -->
+<div class="wipe" id="wipe" aria-hidden="true"></div>
+
+<!-- ░░░ cold open: a garden grows out of the dark ░░░ -->
+<div class="opening" id="opening">
+  <div class="dawn" aria-hidden="true"></div>
+  <div class="garden" id="garden" aria-hidden="true"></div>
+  <div class="soil" aria-hidden="true"></div>
+  <p class="opening-line" id="openingLine"></p>
+  <p class="skip-hint" id="skipHint">click / any key to skip</p>
+</div>
+
+<!-- ░░░ chapter card, shown behind the wipe ░░░ -->
+<div class="chapter" id="chapter" hidden>
+  <p class="chapter-num" id="chapterNum">chapter i</p>
+  <p class="chapter-name" id="chapterName">the question</p>
+</div>
+
+<!-- ░░░ boot / title screen ░░░ -->
+<div class="boot" id="boot">
+  <div class="boot-inner">
+    <p class="boot-tag">a tiny game about one question</p>
+    <h1 class="boot-title">WILL YOU<br />GO OUT<br />WITH ME?</h1>
+    <div class="boot-sprites">
+      <div class="sprite bob" data-sprite="boy"></div>
+      <div class="boot-heart">💗</div>
+      <div class="sprite bob delay" data-sprite="girl"></div>
+    </div>
+    <div class="loadbar"><div class="loadfill" id="loadfill"></div></div>
+    <p class="loadtext" id="loadtext">loading feelings… 0%</p>
+    <p class="boot-start" id="bootStart" hidden>♪ best with sound — press any key</p>
+  </div>
+</div>
+
+<button id="musicBtn" class="music-btn" type="button" aria-pressed="false" title="cute 8-bit music">
+  <span class="note">♪</span><span class="music-label">music off</span>
+</button>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<main class="stage">
+
+  <!-- ░░░ 1. PIXEL DIALOGUE INTRO ░░░ -->
+  <section class="screen is-active" id="scene-intro">
+    <div class="pixel-stage">
+      <div class="sprite-wrap left">
+        <div class="sprite bob" data-sprite="boy"></div>
+        <div class="shadow"></div>
+      </div>
+      <div class="sprite-wrap right">
+        <div class="sprite bob delay" data-sprite="girl"></div>
+        <div class="shadow"></div>
+      </div>
+      <div class="ground"></div>
+    </div>
+
+    <div class="dialogue" id="dialogue">
+      <div class="dialogue-name" id="dlgName">???</div>
+      <p class="dialogue-text" id="dlgText"></p>
+      <button class="dialogue-next" id="dlgNext" type="button">next ▾</button>
+    </div>
+    <p class="hint">(click anywhere / press space to continue)</p>
+  </section>
+
+  <!-- ░░░ 2. THE QUESTION ░░░ -->
+  <section class="screen" id="scene-ask">
+    <!-- the invisible rectangle the "no" button is allowed to roam inside.
+         add ?debug to the URL to see its outline -->
+    <div class="arena" id="arena">
+    <div class="card ask-card">
+      <div class="tape tape-tl"></div>
+      <div class="tape tape-br"></div>
+      <div class="mini-sprites">
+        <div class="sprite tiny bob" data-sprite="boy"></div>
+        <div class="pulse-heart">💗</div>
+        <div class="sprite tiny bob delay" data-sprite="girl"></div>
+        <div class="nudge-bubble" id="nudgeBubble" hidden></div>
+      </div>
+      <h1 class="q-title">will you go on a<br /><span class="glow">date</span> with me?</h1>
+      <p class="q-sub" id="reaction">no pressure. (there is a little pressure)</p>
+
+      <div class="btn-row">
+        <button class="btn btn-yes" id="yesBtn" type="button"><span>YES 💖</span></button>
+        <div class="no-slot">
+          <button class="btn btn-no" id="noBtn" type="button" tabindex="-1" aria-hidden="true">no</button>
+        </div>
+      </div>
+      <p class="tiny-note" id="tinyNote">psst — one of these buttons is a coward</p>
+    </div>
+    </div>
+  </section>
+
+  <!-- ░░░ 3. CELEBRATION ░░░ -->
+  <section class="screen" id="scene-yay">
+    <div class="yay-wrap">
+      <div class="big-hearts"><span>💗</span><span>💞</span><span>💗</span></div>
+      <h1 class="yay-title">SHE SAID YES</h1>
+      <div class="pixel-stage tight">
+        <div class="couple" id="couple">
+          <div class="sprite bob walk-r" data-sprite="boy"></div>
+          <div class="hand-heart">💕</div>
+          <div class="sprite bob delay walk-l" data-sprite="girl"></div>
+        </div>
+        <div class="ground"></div>
+      </div>
+      <p class="yay-sub">certified, notarised, sealed with a pinky promise.</p>
+      <button class="btn btn-next" id="toPlaces" type="button"><span>okay… so where are we going? →</span></button>
+    </div>
+  </section>
+
+  <!-- ░░░ 3b. COMPATIBILITY TEST ░░░ -->
+  <section class="screen" id="scene-quiz">
+    <h2 class="section-title">official compatibility test 🔬</h2>
+    <p class="section-sub">purely scientific. results legally binding.<br />(there are no wrong answers. there is one right answer.)</p>
+
+    <div class="quiz-card">
+      <div class="quiz-progress"><span id="quizStep">question 1 of 3</span>
+        <div class="quiz-bar"><div class="quiz-fill" id="quizFill"></div></div>
+      </div>
+      <h3 class="quiz-q" id="quizQ">…</h3>
+      <div class="quiz-options" id="quizOptions"></div>
+      <p class="quiz-verdict" id="quizVerdict" hidden></p>
+    </div>
+
+    <div class="result-card" id="quizResult" hidden>
+      <div class="meter"><div class="meter-fill" id="meterFill"></div>
+        <span class="meter-num" id="meterNum">0%</span>
+      </div>
+      <h3 class="result-title">compatibility: <span id="resultPct">0</span>%</h3>
+      <p class="result-note" id="resultNote">calculating…</p>
+      <ul class="result-list" id="resultList"></ul>
+      <button class="btn btn-next" id="toScratch" type="button"><span>okay, one more thing →</span></button>
+    </div>
+  </section>
+
+  <!-- ░░░ 3c. SCRATCH CARD ░░░ -->
+  <section class="screen" id="scene-scratch">
+    <h2 class="section-title">one more thing 💌</h2>
+    <p class="section-sub">i wrote something down but got shy.<br />scratch it off. (click and drag)</p>
+
+    <div class="scratch-wrap">
+      <div class="scratch-under" id="scratchUnder">
+        <p class="scratch-line" id="scratchLine">…</p>
+      </div>
+      <canvas class="scratch-canvas" id="scratchCanvas" width="620" height="300"></canvas>
+      <div class="scratch-hint" id="scratchHint">✧ scratch here ✧</div>
+    </div>
+    <button class="btn btn-next" id="toPlaces2" type="button" hidden><span>okay. now the fun part →</span></button>
+  </section>
+
+  <!-- ░░░ 4. PICK THE DATE ░░░ -->
+  <section class="screen" id="scene-places">
+    <h2 class="section-title">pick our first stop 💌</h2>
+    <p class="section-sub">three options. flip a card to peek, then choose one.<br />(you can change your mind. once. maybe twice.)</p>
+    <div class="places-grid" id="placesGrid"></div>
+    <p class="tiny-note">tip: hover a card to flip it over</p>
+  </section>
+
+  <!-- ░░░ 4b. WHEN? ░░░ -->
+  <section class="screen" id="scene-when">
+    <h2 class="section-title">when are you free? 🗓️</h2>
+    <p class="section-sub" id="whenSub">picking a day makes it real, sorry.</p>
+
+    <div class="when-card">
+      <p class="when-label">the day</p>
+      <div class="chips" id="dayChips"></div>
+      <p class="when-label">the time</p>
+      <div class="chips" id="timeChips"></div>
+      <div class="when-actions">
+        <button class="btn btn-ghost" id="backToPlaces2" type="button"><span>← different place</span></button>
+        <button class="btn btn-next" id="toTicket" type="button" disabled><span>make it official →</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░░ 5. TICKET ░░░ -->
+  <section class="screen" id="scene-final">
+    <div class="ticket">
+      <div class="ticket-top">
+        <span class="ticket-label">admit two</span>
+        <span class="ticket-num">no. 001</span>
+      </div>
+      <h2 class="ticket-title" id="ticketTitle">our date</h2>
+      <div class="perf"></div>
+      <dl class="ticket-rows">
+        <div><dt>where</dt><dd id="ticketWhere">—</dd></div>
+        <div><dt>when</dt><dd>you pick 💗</dd></div>
+        <div><dt>who</dt><dd id="ticketWho">—</dd></div>
+        <div><dt>dress code</dt><dd>devastating</dd></div>
+        <div><dt>who's paying</dt><dd>me, obviously</dd></div>
+        <div><dt>day</dt><dd id="ticketDay">—</dd></div>
+        <div><dt>time</dt><dd id="ticketTime">—</dd></div>
+        <div><dt>compatibility</dt><dd id="ticketMatch">—</dd></div>
+        <div><dt>no button</dt><dd id="ticketDodges">—</dd></div>
+      </dl>
+      <div class="ticket-links">
+        <a class="ticket-link" id="ticketLink" href="#" target="_blank" rel="noopener">open the place ↗</a>
+        <button class="ticket-link alt" id="copyPlan" type="button">copy the plan 📋</button>
+      </div>
+      <p class="ticket-foot">screenshot this. it's legally binding now.</p>
+      <div class="ticket-sprites">
+        <div class="sprite tiny bob" data-sprite="boy"></div>
+        <div class="sprite tiny bob delay" data-sprite="girl"></div>
+      </div>
+      <button class="btn btn-ghost" id="backToPlaces" type="button"><span>← actually, show me the others</span></button>
+      <div class="stamp" aria-hidden="true">
+        <span>sealed<br />with a<br />pinky<br />promise</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">made with way too much css and a little bit of a crush</footer>
+
+<script src="app.js"></script>
+<script src="extras.js"></script>
+</body>
+</html>
