@@ -22,41 +22,41 @@ const PLACES = [
   {
     emoji: "☕",
     badge: "option 01",
-    name: "PLACE ONE",
-    blurb: "A one-line pitch for why this place is a vibe.",
+    name: "Sky Bar-Hilton",
+    blurb: "Pool, Rooftop Ambience, Roof, View, Bar, Interior",
     tags: ["cosy", "we can talk for hours", "good lighting"],
     plan: [
-      "meet at 5pm-ish",
+      "meet at 9pm-ish",
       "order the thing they're famous for",
       "walk around after until we're tired",
     ],
-    link: "",                                   // ← PASTE LINK 1
+    link: "https://www.zomato.com/ncr/vibe-the-sky-bar-doubletree-by-hilton-sector-50-gurgaon",                                   // ← PASTE LINK 1
   },
   {
     emoji: "🍜",
     badge: "option 02",
-    name: "PLACE TWO",
-    blurb: "A one-line pitch for why this place is a vibe.",
-    tags: ["a little fancy", "great food", "photo spot"],
+    name: "Clock Tower",
+    blurb: "A Black Tie Crowd, Wooden Interiors, Outdoor Seating Arrangement, Great View",
+    tags: ["a little fancy", "great food", "classy"],
     plan: [
-      "early dinner",
+      "good dinner",
       "split dessert (i'll pretend to share)",
       "dramatic post-dinner walk",
     ],
-    link: "",                                   // ← PASTE LINK 2
+    link: "https://www.zomato.com/ncr/clock-tower-golf-course-road",                                   // ← PASTE LINK 2
   },
   {
     emoji: "🎡",
     badge: "option 03",
-    name: "PLACE THREE",
-    blurb: "A one-line pitch for why this place is a vibe.",
+    name: "Bellagio",
+    blurb: "Great Vibe, Great Host, Good Vibe, Excellent Ambience, Great Music",
     tags: ["fun", "slightly chaotic", "main character energy"],
     plan: [
-      "get there before sunset",
-      "do the touristy thing unironically",
+      "get there before 10pm",
+      "create the vibe",
       "ice cream, obviously",
     ],
-    link: "",                                   // ← PASTE LINK 3
+    link: "https://www.zomato.com/ncr/bellagio-sector-56-gurgaon",                                   // ← PASTE LINK 3
   },
 ];
 
@@ -66,10 +66,13 @@ const PLACES = [
 const SCRIPT_LINES = [
   { who: "me",  text: "okay okay okay. deep breath." },
   { who: "her", text: "...why are you standing like that" },
-  { who: "me",  text: "no reason! totally normal posture." },
+  { who: "me",  text: "no reason! totally normal posture. UFF you're so naggy!!!" },
   { who: "me",  text: "so. i built a whole website. for one question." },
   { who: "her", text: "you built a WEBSITE?" },
-  { who: "me",  text: "i panicked and learned css. let me have this." },
+  { who: "me",  text: "I panicked that maybe I cannot give a surprise" },
+  { who: "her", text: "What surprise?" },
+  { who: "me", text: "Arre, surprise for where I take you on Saturday night!" },
+  { who: "her", text: "yeah fine wtv" },
   { who: "me",  text: "ready? okay. here it comes ->" },
 ];
 
