@@ -11,8 +11,8 @@
    These show up as the name tags above the dialogue box,
    and on the final ticket.                                    */
 const CONFIG = {
-  myName: "ME",       // ← your name,  e.g. "ARJUN"
-  herName: "HER",     // ← her name,   e.g. "ANANYA"
+  myName: "Suchit",       // ← your name,  e.g. "ARJUN"
+  herName: "Billa",     // ← her name,   e.g. "ANANYA"
 };
 
 /* ═══ 2) THE 3 DATE OPTIONS ══════════════════════════════════
