@@ -502,6 +502,7 @@ document.getElementById("toPlaces").addEventListener("click", () => goTo("scene-
 /* ════════════════════ 3. the three places ════════════════════ */
 const grid = document.getElementById("placesGrid");
 const TILTS = ["-1.8deg", "1.6deg", "1.2deg"];
+const placeCards = [];
 
 PLACES.forEach((p, i) => {
   const card = document.createElement("div");
@@ -516,6 +517,7 @@ PLACES.forEach((p, i) => {
           <span class="emoji small">${p.emoji}</span>`
                     : `<span class="emoji">${p.emoji}</span>`}
         </div>
+        <div class="scout-stamp" aria-hidden="true">scouted<br />✦ ${p.badge.replace(/\D/g, "")} ✦</div>
         <h3 class="place-name">${p.name}</h3>
         <p class="place-blurb">${p.blurb}</p>
         <div class="tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
@@ -525,7 +527,8 @@ PLACES.forEach((p, i) => {
         <h4>the plan for<br />${p.name}</h4>
         <ul class="plan">${p.plan.map((s) => `<li><span>${s}</span></li>`).join("")}</ul>
         <div class="back-actions">
-          ${p.link ? `<a class="btn-sm alt" href="${p.link}" target="_blank" rel="noopener">see the place ↗</a>` : ""}
+          ${p.link ? `<a class="btn-sm alt scout-link" href="${p.link}" target="_blank" rel="noopener"
+                data-scout="${i}">scout it out ↗</a>` : ""}
           <button class="btn-sm" type="button" data-pick="${i}">pick this one 💗</button>
         </div>
       </div>
@@ -535,6 +538,7 @@ PLACES.forEach((p, i) => {
     card.classList.toggle("flipped");
     blip(520, 0.05);
   });
+  placeCards[i] = card;
   grid.appendChild(card);
 });
 
@@ -543,6 +547,7 @@ const ticketWhere = document.getElementById("ticketWhere");
 const ticketLink = document.getElementById("ticketLink");
 const ticketWho = document.getElementById("ticketWho");
 const ticketDodges = document.getElementById("ticketDodges");
+const ticketScout = document.getElementById("ticketScout");
 const ticketDay = document.getElementById("ticketDay");
 const ticketTime = document.getElementById("ticketTime");
 const ticketMatch = document.getElementById("ticketMatch");
@@ -559,6 +564,10 @@ function buildTicket() {
   ticketDay.textContent = chosenDay || "you pick 💗";
   ticketTime.textContent = chosenTime || "you pick 💗";
   ticketMatch.textContent = matchPct ? matchPct + "% (scientific)" : "off the charts";
+  ticketScout.textContent =
+    scoutN === 3 ? "scouted all 3 ✓ thorough"
+  : scoutN      ? `scouted ${scoutN} of 3, then got impatient`
+                : "picked on pure vibes. respect.";
   ticketDodges.textContent = scares
     ? `dodged you ${scares} time${scares === 1 ? "" : "s"}`
     : "never even tried";
@@ -1580,3 +1589,396 @@ window.addEventListener("keydown", (e) => {
 }, true);
 
 runOpening();
+
+/* ════════════════════ the scouting mission ═══════════════════
+   The three links stop being an exit and become a little errand:
+   go and look at the place, come back, and the card gets stamped.
+   Picking without scouting is always allowed — the ticket just
+   quietly notices.                                              */
+
+const scoutBar  = document.getElementById("scoutBar");
+const scoutPips = document.getElementById("scoutPips");
+const scoutSay  = document.getElementById("scoutSay");
+const scoutNEl  = document.getElementById("scoutCount");
+
+const SCOUT_SAYS = [
+  "before you decide… go have a look 👀",
+  "ooh. and? do we like it?",
+  "two down. one more, don't get lazy now",
+  "okay you did your homework. i'm impressed. 💗",
+];
+
+const scouted = PLACES.map(() => false);
+let scoutN = 0;
+let pendingScout = -1;
+let scoutFallback = 0;
+
+PLACES.forEach(() => scoutPips.appendChild(document.createElement("i")));
+
+function updateScoutBar() {
+  scoutNEl.textContent = scoutN;
+  [...scoutPips.children].forEach((pip, i) => pip.classList.toggle("on", scouted[i]));
+  scoutBar.classList.toggle("done", scoutN === PLACES.length);
+  const line = SCOUT_SAYS[Math.min(scoutN, SCOUT_SAYS.length - 1)];
+  if (scoutSay.textContent === line) return;
+  scoutSay.classList.add("swap");            // fade out, swap the words, fade back
+  setTimeout(() => {
+    scoutSay.textContent = line;
+    scoutSay.classList.remove("swap");
+  }, 250);
+}
+
+function markScouted(i) {
+  pendingScout = -1;
+  clearInterval(scoutFallback);
+  const card = placeCards[i];
+  if (!card || scouted[i]) return;            // one stamp per place
+
+  scouted[i] = true;
+  scoutN++;
+  card.classList.add("scouted");
+  const link = card.querySelector(".scout-link");
+  if (link) link.textContent = "scouted ✓ look again ↗";
+
+  /* confetti thrown from the card itself */
+  const r = card.getBoundingClientRect();
+  for (let k = 0; k < 14; k++) {
+    spawnTrail(r.left + r.width * (0.2 + Math.random() * 0.6),
+               r.top + r.height * (0.2 + Math.random() * 0.3));
+  }
+  blip(620, 0.05);
+  setTimeout(() => blip(880, 0.05), 90);
+
+  updateScoutBar();
+
+  if (scoutN === PLACES.length) {
+    setTimeout(() => {
+      jingle();
+      toast("all three scouted. thorough. i like that. 💗", 3200);
+    }, 420);
+  }
+}
+
+grid.addEventListener("click", (e) => {
+  const a = e.target.closest(".scout-link");
+  if (!a) return;
+  const i = Number(a.dataset.scout);
+  if (scouted[i]) return;
+  pendingScout = i;
+  /* if the new tab never actually took focus (popup blocked, and so on)
+     stamp it anyway — but only while we're still the visible, focused tab,
+     and keep checking for a bit in case focus settles late */
+  clearInterval(scoutFallback);
+  let tries = 0;
+  scoutFallback = setInterval(() => {
+    if (++tries > 12) return clearInterval(scoutFallback);       // ~8s, then give up
+    if (!document.hidden && document.hasFocus()) markScouted(i);
+  }, 700);
+});
+
+/* she's back */
+function scoutReturned() {
+  if (pendingScout < 0 || document.hidden) return;
+  const i = pendingScout;
+  setTimeout(() => markScouted(i), 280);      // let the tab settle first
+}
+window.addEventListener("focus", scoutReturned);
+document.addEventListener("visibilitychange", scoutReturned);
+
+updateScoutBar();
+
+/* ════════════════════ the peek portal ════════════════════════
+   Hovering a scout button raises a pixel viewfinder above the card:
+   a little generated diorama of that place seen through binoculars,
+   with the link typing itself out underneath. Built the same way the
+   flowers are, so it's never quite identical twice.               */
+
+if (!COARSE) (() => {
+  const GW = 44, GH = 28, U = 5;               // a 44×28 pixel scene, 5px per pixel
+
+  const peek = document.createElement("div");
+  peek.className = "peek";
+  peek.innerHTML = '<canvas></canvas>' +
+    '<p class="peek-url"><span class="peek-txt"></span><i class="peek-caret"></i></p>';
+  document.body.appendChild(peek);
+
+  const cv = peek.querySelector("canvas");
+  const txt = peek.querySelector(".peek-txt");
+  const g = cv.getContext("2d");
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cv.width = GW * U * dpr;
+  cv.height = GH * U * dpr;
+  cv.style.width = GW * U + "px";
+  cv.style.height = GH * U + "px";
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const px = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x * U, y * U, w * U, h * U); };
+
+  /* a seeded RNG, so a diorama holds still while it's open
+     but the next hover rolls a fresh one */
+  function seeded(seed) {
+    let s = (seed >>> 0) || 1;
+    return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  }
+
+  const DUSK = ["#241a45", "#31235a", "#422c66", "#5d3a70", "#8a4a72", "#bd5d80", "#e08a80"];
+
+  function sky(pal, rows) {
+    for (let y = 0; y < rows; y++) {
+      px(0, y, GW, 1, pal[Math.min(pal.length - 1, (y / rows * pal.length) | 0)]);
+    }
+  }
+  function stars(list, t, rows) {
+    list.forEach((s) => {
+      if (s.y >= rows) return;
+      if ((t + s.ph) % 14 < 8) px(s.x, s.y, 1, 1, s.big ? "#fffaf4" : "#ffe3f1");
+    });
+  }
+
+  /* ── option 01: the rooftop pool bar ── */
+  function rooftop(w, t) {
+    sky(DUSK, 17);
+    stars(w.stars, t, 12);
+    px(0, 15, GW, 2, "#e0787f");                              // horizon glow
+    w.towers.forEach((b) => {                                 // skyline + lit windows
+      px(b.x, 17 - b.h, b.w, b.h, "#1b1433");
+      for (let y = 17 - b.h + 1; y < 16; y += 2) {
+        for (let x = b.x + 1; x < b.x + b.w - 1; x += 2) {
+          if ((x * 7 + y * 13 + ((t / 6) | 0)) % 5 < 2) px(x, y, 1, 1, "#ffe9a8");
+        }
+      }
+    });
+    px(0, 17, GW, 1, "#efe0c8");                              // pool rim
+    px(0, 18, GW, 6, "#3f9dcb");                              // water
+    for (let y = 18; y < 24; y++) {                           // ripples, drifting
+      for (let x = ((t * 0.5 + y * 3) | 0) % 6; x < GW; x += 6) px(x, y, 2, 1, "#79c8e8");
+    }
+    px(0, 24, GW, 4, "#d8c3a6");                              // deck
+    for (let x = 0; x < GW; x += 5) px(x, 24, 1, 4, "#c2a888");
+    [3, 10].forEach((x) => {                                  // two loungers
+      px(x, 22, 6, 1, "#fffaf4");
+      px(x, 21, 2, 1, "#fffaf4");
+      px(x + 5, 23, 1, 1, "#8a4a6d");
+    });
+    px(33, 20, 6, 1, "#8a4a6d");                              // a little table
+    px(35, 21, 2, 3, "#8a4a6d");
+    px(30, 18, 3, 1, "#ffe3f1");                              // and the cocktail
+    px(31, 19, 1, 2, "#ffe3f1");
+    px(30, 17, 3, 1, "#ff4f9f");
+    px(32, 15, 1, 2, "#b8ecdd");
+    w.lights.forEach((l, i) => {                              // string lights
+      if (l.y > 1) px(l.x, l.y - 1, 1, 1, "#3d1d31");
+      px(l.x, l.y, 1, 1, ((t / 5 | 0) + i) % 4 ? "#ffe9a8" : "#fffaf4");
+    });
+  }
+
+  /* ── option 02: the clock tower ── */
+  function tower(w, t) {
+    sky(["#1c1b3e", "#272254", "#372a60", "#4d3568", "#6f3f6c", "#9c4f74"], 24);
+    stars(w.stars, t, 18);
+    px(0, 24, GW, 4, "#2c3a2e");                              // ground
+    [[1, 8], [34, 9]].forEach(([x, wd]) => {                  // trees
+      px(x, 18, wd, 6, "#25452f");
+      px(x + 1, 16, wd - 2, 2, "#2e5a3a");
+      px(x + 2, 20, 1, 4, "#3a2a20");
+    });
+    px(18, 6, 9, 18, "#e8dcc8");                              // tower
+    px(25, 6, 2, 18, "#c0ab8e");                              // its shaded side
+    px(18, 6, 9, 1, "#8a4a6d");
+    for (let i = 0; i < 4; i++) px(19 + i, 5 - i, 9 - i * 2, 1, "#8a3f52");   // roof
+    px(22, 1, 1, 1, "#ffe9a8");                               // finial
+    px(19, 8, 7, 7, "#fffaf4");                               // the clock face
+    px(19, 8, 7, 1, "#5d2a48");
+    px(19, 14, 7, 1, "#5d2a48");
+    px(19, 8, 1, 7, "#5d2a48");
+    px(25, 8, 1, 7, "#5d2a48");
+    const cx = 22, cy = 11;
+    px(cx, cy, 1, 1, "#5d2a48");
+    for (let r = 1; r <= 2; r++) px(cx - r, cy, 1, 1, "#5d2a48");             // stuck at 9
+    const a = -Math.PI / 2 + (t % 120) / 120 * Math.PI * 2;                   // minute hand
+    for (let r = 1; r <= 2; r++) {
+      px(cx + Math.round(Math.cos(a) * r), cy + Math.round(Math.sin(a) * r), 1, 1, "#e0327f");
+    }
+    [[20, 17], [24, 17], [20, 20], [24, 20]].forEach(([x, y], i) => {         // warm windows
+      px(x, y, 2, 2, ((t / 7 | 0) + i) % 6 ? "#ffe9a8" : "#ffd77a");
+    });
+    px(21, 21, 3, 3, "#5d2a48");                              // door
+  }
+
+  /* ── option 03: the loud one ── */
+  function neon(w, t) {
+    for (let y = 0; y < GH; y++) px(0, y, GW, 1, y < 17 ? "#33203a" : "#2a1a30");
+    const glow = (t / 6 | 0) % 11 !== 3;                      // the sign flickers
+    px(12, 2, 21, 9, glow ? "#4a2547" : "#3a2040");           // its halo on the wall
+    const nc = glow ? "#ff4f9f" : "#8a2f60";
+    px(13, 3, 19, 1, nc);
+    px(13, 10, 19, 1, nc);
+    px(13, 3, 1, 8, nc);
+    px(31, 3, 1, 8, nc);
+    const gc = glow ? "#b8ecdd" : "#4d7a70";                  // a neon cocktail glass
+    px(18, 5, 8, 1, gc);
+    px(19, 6, 6, 1, gc);
+    px(20, 7, 4, 1, gc);
+    px(21, 8, 2, 1, gc);
+    px(20, 9, 4, 1, gc);
+    if (glow) px(26, 4, 1, 1, "#ffe9a8");
+    px(11, 16, 22, 1, "#5a3a2a");                             // the back shelf
+    w.bottles.forEach((b) => {                                // and what's on it
+      px(b.x, b.y, 1, 16 - b.y, b.c);
+      px(b.x, b.y - 1, 1, 1, "#efe2c9");
+    });
+    [12, 28].forEach((x) => {                                 // two of us, backlit
+      px(x + 1, 12, 3, 3, "#190f1c");
+      px(x, 15, 5, 4, "#190f1c");
+      px(x - 1, 17, 7, 2, "#190f1c");
+    });
+    px(0, 19, GW, 2, "#8a5a35");                              // the bar itself
+    px(0, 21, GW, 7, "#5f3a22");
+    for (let x = 3; x < GW; x += 7) px(x, 21, 1, 7, "#4a2c19");
+    [20, 25].forEach((x, i) => {                              // candles on the counter
+      px(x, 18, 1, 1, "#efe2c9");
+      px(x, 17, 1, 1, ((t / 4 | 0) + i) % 3 ? "#ffe9a8" : "#ff9db5");
+    });
+    w.notes.forEach((n, i) => {                               // music drifting up
+      const y = 12 - ((t * 0.35 + i * 5) % 11 | 0);
+      if (y < 2) return;
+      px(n.x, y, 1, 2, "#ffc9e3");
+      px(n.x + 1, y, 1, 1, "#ffc9e3");
+    });
+  }
+
+  const SCENES = [rooftop, tower, neon];
+
+  /* everything random about a diorama, rolled once per hover */
+  function makeWorld(seed) {
+    const r = seeded(seed);
+    const w = { stars: [], towers: [], lights: [], bottles: [], notes: [] };
+    for (let i = 0; i < 26; i++) {
+      w.stars.push({ x: (r() * GW) | 0, y: (r() * 16) | 0, ph: (r() * 14) | 0, big: r() < 0.25 });
+    }
+    for (let x = 0; x < GW;) {
+      const wd = 3 + ((r() * 5) | 0);
+      w.towers.push({ x, w: wd, h: 3 + ((r() * 9) | 0) });
+      x += wd + ((r() * 2) | 0);
+    }
+    for (let x = 2; x < GW; x += 4) {
+      w.lights.push({ x, y: 1 + (((Math.sin(x / 5) + 1) * 1.4) | 0) });
+    }
+    const cols = ["#79c8e8", "#b8ecdd", "#ffe9a8", "#ff9db5", "#d9c6ff"];
+    [17, 19, 21, 23, 25, 27].forEach((x) => {
+      w.bottles.push({ x, y: 12 + ((r() * 3) | 0), c: cols[(r() * cols.length) | 0] });
+    });
+    for (let i = 0; i < 4; i++) w.notes.push({ x: 14 + ((r() * 16) | 0) });
+    return w;
+  }
+
+  /* the viewfinder: keep a circle of the scene, pixel-rim it, add crosshair ticks */
+  function lens() {
+    const cx = GW / 2, cy = GH / 2, rr = 13.2;
+    g.save();
+    g.globalCompositeOperation = "destination-in";
+    g.beginPath();
+    g.arc(cx * U, cy * U, rr * U, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    for (let a = 0; a < 96; a++) {
+      const th = a / 96 * Math.PI * 2;
+      px(Math.round(cx + Math.cos(th) * rr), Math.round(cy + Math.sin(th) * rr), 1, 1, "#3d1d31");
+    }
+    [[0, -1], [0, 1], [-1, 0], [1, 0]].forEach(([dx, dy]) => {
+      for (let k = 2; k <= 3; k++) {
+        px(Math.round(cx + dx * (rr - k)), Math.round(cy + dy * (rr - k)), 1, 1, "#ff9db5");
+      }
+    });
+  }
+
+  let raf = 0, frame = 0, world = null, scene = null, last = 0;
+
+  function render(now) {
+    raf = requestAnimationFrame(render);
+    if (now - last < 90) return;                              // ~11fps, on purpose
+    last = now;
+    g.clearRect(0, 0, GW * U, GH * U);
+    scene(world, frame++);
+    lens();
+  }
+
+  function paintOnce() {
+    g.clearRect(0, 0, GW * U, GH * U);
+    scene(world, frame);
+    lens();
+  }
+
+  /* the link, typing itself out */
+  let typer = 0;
+  function typeUrl(url) {
+    clearInterval(typer);
+    let clean = url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+    if (clean.length > 40) clean = clean.slice(0, 39) + "…";
+    if (REDUCED) { txt.textContent = clean; return; }
+    txt.textContent = "";
+    let i = 0;
+    typer = setInterval(() => {
+      txt.textContent = clean.slice(0, ++i);
+      if (i % 4 === 0) blip(1200 + (i % 5) * 90, 0.014);
+      if (i >= clean.length) clearInterval(typer);
+    }, 26);
+  }
+
+  function position(link) {
+    const rect = link.getBoundingClientRect();
+    const host = rect;
+    peek.style.visibility = "hidden";
+    peek.classList.add("on");
+    const w = peek.offsetWidth, h = peek.offsetHeight;
+    const cx = rect.left + rect.width / 2;
+    const clamped = Math.min(Math.max(cx, 10 + w / 2), window.innerWidth - 10 - w / 2);
+    const above = host.top - h - 12;
+    peek.classList.toggle("below", above < 8);
+    peek.style.setProperty("--tail", (cx - clamped) + "px");
+    peek.style.left = clamped + "px";
+    peek.style.top = (above < 8 ? host.bottom + 12 : above) + "px";
+    peek.style.visibility = "";
+  }
+
+  let openTimer = 0;
+  function open(link) {
+    const i = Number(link.dataset.scout);
+    world = makeWorld((Date.now() ^ (i * 2654435761)) >>> 0);
+    scene = SCENES[i % SCENES.length];
+    frame = 0;
+    last = 0;
+    paintOnce();
+    position(link);
+    typeUrl(link.href);
+    if (!REDUCED) {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(render);
+    }
+    blip(1500, 0.02);
+  }
+
+  function close() {
+    clearTimeout(openTimer);
+    clearInterval(typer);
+    cancelAnimationFrame(raf);
+    raf = 0;
+    peek.classList.remove("on");
+  }
+
+  grid.addEventListener("mouseover", (e) => {
+    const link = e.target.closest(".scout-link");
+    if (!link || peek.classList.contains("on")) return;
+    clearTimeout(openTimer);
+    openTimer = setTimeout(() => open(link), 110);
+  });
+  grid.addEventListener("mouseout", (e) => {
+    const from = e.target.closest(".scout-link");
+    if (!from) return;
+    const to = e.relatedTarget;
+    if (to && to.closest && to.closest(".scout-link") === from) return;
+    close();
+  });
+  window.addEventListener("scroll", close, { passive: true });
+  window.addEventListener("resize", close);
+})();

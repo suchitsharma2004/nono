@@ -30,7 +30,15 @@ A pixel-cute, pink, animated date proposal site.
 5. **Ch. V - the shy part** - a real scratch card. Canvas foil you scratch off with the mouse
    to reveal the note. Big 58px brush, clears itself at 20% scratched (checked mid-swipe, not
    only on mouse-up), and a single click clears a whole patch - a couple of swipes is enough.
-6. **Ch. VI - choose our stop** - the 3 flippable polaroid cards.
+6. **Ch. VI - choose our stop** - the 3 flippable polaroid cards, plus **the scouting
+   mission**: each card's link is now an errand, not an exit. Flip a card, hover
+   "scout it out" and a **peek portal** rises above it - a pixel diorama of that place seen
+   through binoculars (rooftop pool / clock tower / neon bar), generated fresh each hover the
+   same way the flowers are, with the link typing itself out underneath. Click it, go look at
+   the real place, and when you come back the card gets **stamped SCOUTED** with confetti, a
+   pip fills on the tracker, and the line above the cards answers back. Scout all three and
+   she gets a jingle and a toast. Picking without scouting is always allowed - the ticket
+   just quietly notices (the **homework** row).
 7. **Ch. VII - choose our day** - day + time chips; "make it official" unlocks once both are set.
 8. **Ch. VIII - it's a date** - the ticket, filled in from everything she chose, with a
    "copy the plan" button that puts the whole thing on her clipboard.

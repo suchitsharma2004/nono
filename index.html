@@ -179,9 +179,16 @@
   <!-- ░░░ 4. PICK THE DATE ░░░ -->
   <section class="screen" id="scene-places">
     <h2 class="section-title">pick our first stop 💌</h2>
-    <p class="section-sub">three options. flip a card to peek, then choose one.<br />(you can change your mind. once. maybe twice.)</p>
+    <p class="section-sub">three options. flip a card to peek — but before you decide,<br />go and have a proper look at each one. 👀</p>
+
+    <div class="scout-bar" id="scoutBar">
+      <span class="scout-pips" id="scoutPips" aria-hidden="true"></span>
+      <span class="scout-count"><b id="scoutCount">0</b> / 3 scouted</span>
+      <span class="scout-say" id="scoutSay">before you decide… go have a look 👀</span>
+    </div>
+
     <div class="places-grid" id="placesGrid"></div>
-    <p class="tiny-note">tip: hover a card to flip it over</p>
+    <p class="tiny-note">tip: hover a card to flip it over · hover the scout button to peek first</p>
   </section>
 
   <!-- ░░░ 4b. WHEN? ░░░ -->
@@ -220,6 +227,7 @@
         <div><dt>time</dt><dd id="ticketTime">—</dd></div>
         <div><dt>compatibility</dt><dd id="ticketMatch">—</dd></div>
         <div><dt>no button</dt><dd id="ticketDodges">—</dd></div>
+        <div><dt>homework</dt><dd id="ticketScout">—</dd></div>
       </dl>
       <div class="ticket-links">
         <a class="ticket-link" id="ticketLink" href="#" target="_blank" rel="noopener">open the place ↗</a>
