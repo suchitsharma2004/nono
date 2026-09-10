@@ -12,7 +12,7 @@
    and on the final ticket.                                    */
 const CONFIG = {
   myName: "Suchit",       // ← your name,  e.g. ""
-  herName: "Poopey Baby",     // ← her name,   e.g. ""
+  herName: "Billu",     // ← her name,   e.g. ""
 };
 
 /* ═══ 2) THE 3 DATE OPTIONS ══════════════════════════════════
